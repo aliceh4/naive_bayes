@@ -37,13 +37,13 @@ def naiveBayes(train_set, train_labels, dev_set, smoothing_parameter, pos_prior)
     # return predicted labels of development set
 
     # first get our list of likelihoods
-    ham_freq, spam_freq = calculate_likelihood(train_set, train_labels, smoothing_parameter)
+    ham_freq, spam_freq = calculate_likelihood(train_set, train_labels)
     predicted_labels = development_phase(ham_freq, spam_freq, dev_set, smoothing_parameter, pos_prior)
 
     return predicted_labels
 
 
-def calculate_likelihood(train_set, train_labels, smoothing_parameter):
+def calculate_likelihood(train_set, train_labels):
     """
     We want to calculate the posterior probabilities: P(Ham | Words) = P(Ham) * product of P(word | ham)
 
@@ -71,6 +71,11 @@ def development_phase(ham_freq, spam_freq, dev_set, smoothing_parameter, pos_pri
     # Initialize our labels list
     labels = []
 
+    total_ham = sum(ham_freq.values())
+    total_spam = sum(spam_freq.values())
+    ham_len = len(list(ham_freq))
+    spam_len = len(list(spam_freq))
+
     # Iterate through our emails
     for email in dev_set:
         # Take log to prevent underflow issues
@@ -79,10 +84,7 @@ def development_phase(ham_freq, spam_freq, dev_set, smoothing_parameter, pos_pri
 
         # Go through each word in email
         # NOTE: likelihood = [count(x) + k] / [N + k|X|]
-        total_ham = sum(ham_freq.values())
-        total_spam = sum(spam_freq.values())
-        ham_len = len(list(ham_freq))
-        spam_len = len(list(spam_freq))
+
 
         for word in email:
             # Check if word is in our likelihood dict (if word is not present, then likelihood = [0 + k] / [N + k|X|])
