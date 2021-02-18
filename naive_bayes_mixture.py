@@ -42,8 +42,12 @@ def naiveBayesMixture(train_set, train_labels, dev_set, bigram_lambda, unigram_s
 
     # TODO: Write your code here
     # return predicted labels of development set
+    if (len(dev_set) == 0):
+        return []
+
     ham_freq, spam_freq, ham_freq2, spam_freq2 = calculate_likelihood(train_set, train_labels)
     labels = development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigram_smoothing_parameter, bigram_smoothing_parameter, pos_prior, bigram_lambda)
+
 
 
     return labels
@@ -62,9 +66,7 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
     ham_len2 = len(list(ham_freq2))
     spam_len2 = len(list(spam_freq2))
     
-    if (len(dev_set) == 0 or len(train_set) == 0):
-        return []
-        
+
     for email in dev_set:
         # Take log to prevent underflow issues
         prob_ham = math.log10(pos_prior)
