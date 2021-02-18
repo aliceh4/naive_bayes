@@ -62,13 +62,16 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
     ham_len2 = len(list(ham_freq2))
     spam_len2 = len(list(spam_freq2))
     
+    if (len(dev_set) == 0 or len(train_set) == 0):
+        return []
+        
     for email in dev_set:
         # Take log to prevent underflow issues
-        prob_ham = math.log(pos_prior)
-        prob_spam = math.log(1.0 - pos_prior)
+        prob_ham = math.log10(pos_prior)
+        prob_spam = math.log10(1.0 - pos_prior)
 
-        prob_ham2 = math.log(pos_prior)
-        prob_spam2 = math.log(1.0 - pos_prior)
+        prob_ham2 = math.log10(pos_prior)
+        prob_spam2 = math.log10(1.0 - pos_prior)
 
         # Go through each word in email
         for j in range (len(email)):
@@ -77,27 +80,27 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
             word = email[j]
             # Check if word is in our likelihood dict (if word is not present, then likelihood = [0 + k] / [N + k|X|])
             if word in ham_freq.keys():
-                prob_ham += math.log(float(ham_freq[word] + unigram_smoothing_parameter) / float(total_ham + unigram_smoothing_parameter * ham_len))
+                prob_ham += math.log10(float(ham_freq[word] + unigram_smoothing_parameter) / float(total_ham + unigram_smoothing_parameter * ham_len))
             else:
-                prob_ham += math.log(float(unigram_smoothing_parameter) / float(total_ham + unigram_smoothing_parameter * ham_len))
+                prob_ham += math.log10(float(unigram_smoothing_parameter) / float(total_ham + unigram_smoothing_parameter * ham_len))
 
             if word in spam_freq.keys():
-                prob_spam += math.log(float(spam_freq[word] + unigram_smoothing_parameter) / float(total_spam + unigram_smoothing_parameter * spam_len))
+                prob_spam += math.log10(float(spam_freq[word] + unigram_smoothing_parameter) / float(total_spam + unigram_smoothing_parameter * spam_len))
             else:
-                prob_spam += math.log(float(unigram_smoothing_parameter) / float(total_spam + unigram_smoothing_parameter * spam_len))
+                prob_spam += math.log10(float(unigram_smoothing_parameter) / float(total_spam + unigram_smoothing_parameter * spam_len))
             
             # BIGRAM
             if (j < len(email) - 1):
                 bigram_words = email[j] + email[j + 1]
                 if bigram_words in ham_freq2.keys():
-                    prob_ham2 += math.log(float(ham_freq2[word] + bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
+                    prob_ham2 += math.log10(float(ham_freq2[word] + bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
                 else:
-                    prob_ham2 += math.log(float(bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
+                    prob_ham2 += math.log10(float(bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
 
                 if bigram_words in spam_freq2.keys():
-                    prob_spam2 += math.log(float(spam_freq2[word] + bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
+                    prob_spam2 += math.log10(float(spam_freq2[word] + bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
                 else:
-                    prob_spam2 += math.log(float(bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
+                    prob_spam2 += math.log10(float(bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
 
         # compare probabilities and populate our labels list accordingly
         ham_prob = (1 - bigram_lambda) * prob_ham + bigram_lambda * prob_ham2
@@ -144,6 +147,5 @@ def calculate_likelihood(train_set, train_labels):
             ham_freq[word] += 1
         else:
             spam_freq[word] += 1  
-    print("finish training")   
-    
+
     return ham_freq, spam_freq, ham_freq2, spam_freq2

@@ -79,8 +79,8 @@ def development_phase(ham_freq, spam_freq, dev_set, smoothing_parameter, pos_pri
     # Iterate through our emails
     for email in dev_set:
         # Take log to prevent underflow issues
-        prob_ham = math.log(pos_prior)
-        prob_spam = math.log(1.0 - pos_prior)
+        prob_ham = math.log10(pos_prior)
+        prob_spam = math.log10(1.0 - pos_prior)
 
         # Go through each word in email
         # NOTE: likelihood = [count(x) + k] / [N + k|X|]
@@ -89,14 +89,14 @@ def development_phase(ham_freq, spam_freq, dev_set, smoothing_parameter, pos_pri
         for word in email:
             # Check if word is in our likelihood dict (if word is not present, then likelihood = [0 + k] / [N + k|X|])
             if word in ham_freq.keys():
-                prob_ham += math.log(float(ham_freq[word] + smoothing_parameter) / float(total_ham + smoothing_parameter * ham_len))
+                prob_ham += math.log10(float(ham_freq[word] + smoothing_parameter) / float(total_ham + smoothing_parameter * ham_len))
             else:
-                prob_ham += math.log(float(smoothing_parameter) / float(total_ham + smoothing_parameter * ham_len))
+                prob_ham += math.log10(float(smoothing_parameter) / float(total_ham + smoothing_parameter * ham_len))
 
             if word in spam_freq.keys():
-                prob_spam += math.log(float(spam_freq[word] + smoothing_parameter) / float(total_spam + smoothing_parameter * spam_len))
+                prob_spam += math.log10(float(spam_freq[word] + smoothing_parameter) / float(total_spam + smoothing_parameter * spam_len))
             else:
-                prob_spam += math.log(float(smoothing_parameter) / float(total_spam + smoothing_parameter * spam_len))
+                prob_spam += math.log10(float(smoothing_parameter) / float(total_spam + smoothing_parameter * spam_len))
 
         # compare probabilities and populate our labels list accordingly
         if (prob_ham > prob_spam):
