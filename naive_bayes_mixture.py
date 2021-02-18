@@ -47,9 +47,6 @@ def naiveBayesMixture(train_set, train_labels, dev_set, bigram_lambda, unigram_s
 
     ham_freq, spam_freq, ham_freq2, spam_freq2 = calculate_likelihood(train_set, train_labels)
     labels = development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigram_smoothing_parameter, bigram_smoothing_parameter, pos_prior, bigram_lambda)
-
-
-
     return labels
 
 def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigram_smoothing_parameter, bigram_smoothing_parameter, pos_prior, bigram_lambda):
@@ -66,7 +63,7 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
     ham_len2 = len(list(ham_freq2))
     spam_len2 = len(list(spam_freq2))
     
-
+    print("66")
     for email in dev_set:
         # Take log to prevent underflow issues
         prob_ham = math.log10(pos_prior)
@@ -92,7 +89,7 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
                 prob_spam += math.log10(float(unigram_smoothing_parameter) / float(total_spam + unigram_smoothing_parameter * spam_len))
             
             # BIGRAM
-            if (j < len(email) - 1):
+            if (j < len(email) - 1 and len(email) > 1):
                 bigram_words = email[j] + email[j + 1]
                 if bigram_words in ham_freq2.keys():
                     prob_ham2 += math.log10(float(ham_freq2[word] + bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
