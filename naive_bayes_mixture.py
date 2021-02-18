@@ -42,7 +42,7 @@ def naiveBayesMixture(train_set, train_labels, dev_set, bigram_lambda, unigram_s
 
     # TODO: Write your code here
     # return predicted labels of development set
-    if (len(dev_set) == 0):
+    if (len(dev_set) == 0 or len(train_set) == 0):
         return []
 
     ham_freq, spam_freq, ham_freq2, spam_freq2 = calculate_likelihood(train_set, train_labels)
