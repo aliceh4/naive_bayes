@@ -38,12 +38,34 @@ def compute_tf_idf(train_set, train_labels, dev_set):
     Return: A list containing words with the highest tf-idf value from the dev_set documents
             Returned list should have same size as dev_set (one word from each dev_set document)
     """
+    # training: get # of docs that contain w
+    word_freq_doc = Counter()
+    for email in train_set:
+        used = []
+        for word in email:   
+            if (word not in used):    
+                word_freq_doc[word] += 1
+                used.append(word)
+            else:
+                continue
 
+    # dev
+    num_train_docs = len(train_set)
+    result = []
+    word_freq = Counter()
+    for email in dev_set:
+        word_freq.clear()
+        for word in email:
+            word_freq[word] += 1
 
+        max_tf = 0
+        for word in email:
+            tf_idf = (word_freq[word]) / (len(email)) * math.log(num_train_docs / (1 + word_freq_doc[word]))
+            if tf_idf > max_tf:
+                new_word = word
+                max_tf = tf_idf
+        result.append(new_word)    
 
-    # TODO: Write your code here
-    
-
-
+        
     # return list of words (should return a list, not numpy array or similar)
-    return []
+    return result
