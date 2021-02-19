@@ -90,6 +90,7 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
             # BIGRAM
             if (j < len(email) - 1):
                 if (j == -1 or (j + 1) > len(email) - 1):
+                    print("here")
                     break
                 
                 bigram_words = email[j] + email[j + 1]
@@ -110,7 +111,7 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
             labels.append(1)
         else:
             labels.append(0)
-
+    print("finish labeling")
     return labels
 
 
@@ -148,4 +149,5 @@ def calculate_likelihood(train_set, train_labels):
             ham_freq[word] += 1
         else:
             spam_freq[word] += 1  
+    print("finish training")
     return ham_freq, spam_freq, ham_freq2, spam_freq2
