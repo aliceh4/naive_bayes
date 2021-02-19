@@ -47,7 +47,7 @@ def naiveBayesMixture(train_set, train_labels, dev_set, bigram_lambda, unigram_s
 
     print(len(dev_set))
     print(len(train_set))
-    
+
     ham_freq, spam_freq, ham_freq2, spam_freq2 = calculate_likelihood(train_set, train_labels)
     labels = development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigram_smoothing_parameter, bigram_smoothing_parameter, pos_prior, bigram_lambda)
     return labels
@@ -134,6 +134,7 @@ def calculate_likelihood(train_set, train_labels):
     for i in range (0, len(train_set)):
         email = train_set[i]
         label = train_labels[i]
+        print(email)
 
         # now iterate through the words in each email
         for j in range(0, len(email) - 1):
@@ -146,11 +147,13 @@ def calculate_likelihood(train_set, train_labels):
             else:
                 spam_freq2[bigram_words] += 1
                 spam_freq[word] += 1
+
         # take care of last word for unigram model
-        word = email[-1]
-        if (label == 1):
-            ham_freq[word] += 1
-        else:
-            spam_freq[word] += 1  
+        if (len(email) != 0):
+            word = email[-1]
+            if (label == 1):
+                ham_freq[word] += 1
+            else:
+                spam_freq[word] += 1  
     print("finish training")
     return ham_freq, spam_freq, ham_freq2, spam_freq2
