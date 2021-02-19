@@ -44,8 +44,7 @@ def naiveBayesMixture(train_set, train_labels, dev_set, bigram_lambda, unigram_s
     # return predicted labels of development set
     if (len(dev_set) == 0 or len(train_set) == 0):
         return []
-    print(len(dev_set))
-    print(len(train_set))
+        
     ham_freq, spam_freq, ham_freq2, spam_freq2 = calculate_likelihood(train_set, train_labels)
     labels = development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigram_smoothing_parameter, bigram_smoothing_parameter, pos_prior, bigram_lambda)
     return labels
@@ -73,7 +72,7 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
         prob_spam2 = math.log10(1.0 - pos_prior)
 
         # Go through each word in email
-        for j in range (len(email) - 1):
+        for j in range (len(email)):
 
             # UNIGRAM
             word = email[j]
@@ -89,28 +88,20 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
                 prob_spam += math.log10(float(unigram_smoothing_parameter) / float(total_spam + unigram_smoothing_parameter * spam_len))
             
             # BIGRAM
-            #if (j < len(email) - 1 and len(email) > 1):
-            bigram_words = email[j] + email[j + 1]
-            if bigram_words in ham_freq2.keys():
-                prob_ham2 += math.log10(float(ham_freq2[word] + bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
-            else:
-                prob_ham2 += math.log10(float(bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
+            if (j < len(email) - 1):
+                if (j == -1 or (j + 1) > len(email) - 1):
+                    break
+                
+                bigram_words = email[j] + email[j + 1]
+                if bigram_words in ham_freq2.keys():
+                    prob_ham2 += math.log10(float(ham_freq2[word] + bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
+                else:
+                    prob_ham2 += math.log10(float(bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
 
-            if bigram_words in spam_freq2.keys():
-                prob_spam2 += math.log10(float(spam_freq2[word] + bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
-            else:
-                prob_spam2 += math.log10(float(bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
-        
-        word = email[-1]
-        if word in ham_freq.keys():
-            prob_ham += math.log10(float(ham_freq[word] + unigram_smoothing_parameter) / float(total_ham + unigram_smoothing_parameter * ham_len))
-        else:
-            prob_ham += math.log10(float(unigram_smoothing_parameter) / float(total_ham + unigram_smoothing_parameter * ham_len))
-
-        if word in spam_freq.keys():
-            prob_spam += math.log10(float(spam_freq[word] + unigram_smoothing_parameter) / float(total_spam + unigram_smoothing_parameter * spam_len))
-        else:
-            prob_spam += math.log10(float(unigram_smoothing_parameter) / float(total_spam + unigram_smoothing_parameter * spam_len))
+                if bigram_words in spam_freq2.keys():
+                    prob_spam2 += math.log10(float(spam_freq2[word] + bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
+                else:
+                    prob_spam2 += math.log10(float(bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
 
         # compare probabilities and populate our labels list accordingly
         ham_prob = (1 - bigram_lambda) * prob_ham + bigram_lambda * prob_ham2
