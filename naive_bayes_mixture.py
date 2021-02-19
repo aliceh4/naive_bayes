@@ -134,7 +134,6 @@ def calculate_likelihood(train_set, train_labels):
     for i in range (0, len(train_set)):
         email = train_set[i]
         label = train_labels[i]
-        print(email)
 
         # now iterate through the words in each email
         for j in range(0, len(email) - 1):
