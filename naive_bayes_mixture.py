@@ -53,19 +53,23 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
 
     total_ham = sum(ham_freq.values())
     total_spam = sum(spam_freq.values())
-    ham_len = len(list(ham_freq))
-    spam_len = len(list(spam_freq))
-
     total_ham2 = sum(ham_freq2.values())
     total_spam2 = sum(spam_freq2.values())
+
+    ham_len = len(list(ham_freq))
+    spam_len = len(list(spam_freq))
     ham_len2 = len(list(ham_freq2))
     spam_len2 = len(list(spam_freq2))
+
+    prob_ham = 0.0
+    prob_spam = 0.0
+    prob_ham2 = 0.0
+    prob_spam2 = 0.0
 
     for email in dev_set:
         # Take log to prevent underflow issues
         prob_ham = math.log10(pos_prior)
         prob_spam = math.log10(1.0 - pos_prior)
-
         prob_ham2 = math.log10(pos_prior)
         prob_spam2 = math.log10(1.0 - pos_prior)
 
@@ -86,22 +90,22 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
                 prob_spam += math.log10(float(unigram_smoothing_parameter) / float(total_spam + unigram_smoothing_parameter * spam_len))
             
             # BIGRAM
-            if (j < len(email) - 1):
+            if j < len(email) - 1:
                 bigram_words = email[j] + email[j + 1]
                 if bigram_words in ham_freq2.keys():
-                    prob_ham2 += math.log10(float(ham_freq2[word] + bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
+                    prob_ham2 += math.log10(float(ham_freq2[bigram_words] + bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
                 else:
                     prob_ham2 += math.log10(float(bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
 
                 if bigram_words in spam_freq2.keys():
-                    prob_spam2 += math.log10(float(spam_freq2[word] + bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
+                    prob_spam2 += math.log10(float(spam_freq2[bigram_words] + bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
                 else:
                     prob_spam2 += math.log10(float(bigram_smoothing_parameter) / float(total_spam2 + bigram_smoothing_parameter * spam_len2))
 
         # compare probabilities and populate our labels list accordingly
         ham_prob = (1 - bigram_lambda) * prob_ham + bigram_lambda * prob_ham2
         spam_prob = (1 - bigram_lambda) * prob_spam + bigram_lambda * prob_spam2
-        if ((ham_prob) > (spam_prob)):
+        if (ham_prob > spam_prob):
             labels.append(1)
         else:
             labels.append(0)
@@ -121,12 +125,12 @@ def calculate_likelihood(train_set, train_labels):
     spam_freq2 = Counter()
 
     # Iterate through train_set and populate frequency in corresponding locations
-    for i in range (0, len(train_set)):
+    for i in range (len(train_set)):
         email = train_set[i]
         label = train_labels[i]
 
         # now iterate through the words in each email
-        for j in range(0, len(email)):
+        for j in range(len(email)):
             word = email[j]
             if (label == 1):
                 ham_freq[word] += 1
@@ -136,7 +140,7 @@ def calculate_likelihood(train_set, train_labels):
             if j < len(email) - 1:
                 bigram_words = email[j] + email[j + 1]
                 if label == 1:
-                     ham_freq2[bigram_words] += 1
+                    ham_freq2[bigram_words] += 1
                 else:
                     spam_freq2[bigram_words] += 1
     return ham_freq, spam_freq, ham_freq2, spam_freq2
