@@ -87,7 +87,7 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
             
             # BIGRAM
             if (j < len(email) - 1):
-                bigram_words = email[j] + " " + email[j + 1]
+                bigram_words = email[j] + email[j + 1]
                 if bigram_words in ham_freq2.keys():
                     prob_ham2 += math.log10(float(ham_freq2[word] + bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
                 else:
@@ -126,22 +126,17 @@ def calculate_likelihood(train_set, train_labels):
         label = train_labels[i]
 
         # now iterate through the words in each email
-        for j in range(0, len(email) - 1):
-            # this is a bigram model, so combine pairs
-            bigram_words = email[j] + " " + email[j + 1]
+        for j in range(0, len(email)):
             word = email[j]
             if (label == 1):
-                ham_freq2[bigram_words] += 1
                 ham_freq[word] += 1
             else:
-                spam_freq2[bigram_words] += 1
                 spam_freq[word] += 1
-
-        # take care of last word for unigram model
-        if (len(email) != 0):
-            word = email[-1]
-            if (label == 1):
-                ham_freq[word] += 1
-            else:
-                spam_freq[word] += 1  
+            
+            if j < len(email) - 1:
+                bigram_words = email[j] + email[j + 1]
+                if label == 1:
+                     ham_freq2[bigram_words] += 1
+                else:
+                    spam_freq2[bigram_words] += 1
     return ham_freq, spam_freq, ham_freq2, spam_freq2
