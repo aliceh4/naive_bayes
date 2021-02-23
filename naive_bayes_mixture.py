@@ -14,6 +14,7 @@ within this file for Part 2 -- the unrevised staff files will be used for all ot
 files and classes when code is run, so be careful to not modify anything else.
 """
 
+
 from collections import Counter
 import math
 
@@ -42,12 +43,6 @@ def naiveBayesMixture(train_set, train_labels, dev_set, bigram_lambda, unigram_s
 
     # TODO: Write your code here
     # return predicted labels of development set
-    if (len(dev_set) == 0 or len(train_set) == 0):
-        return []
-
-    print(len(dev_set))
-    print(len(train_set))
-
     ham_freq, spam_freq, ham_freq2, spam_freq2 = calculate_likelihood(train_set, train_labels)
     labels = development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigram_smoothing_parameter, bigram_smoothing_parameter, pos_prior, bigram_lambda)
     return labels
@@ -92,11 +87,7 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
             
             # BIGRAM
             if (j < len(email) - 1):
-                if (j == -1 or (j + 1) > len(email) - 1):
-                    print("here")
-                    break
-                
-                bigram_words = email[j] + email[j + 1]
+                bigram_words = email[j] + " " + email[j + 1]
                 if bigram_words in ham_freq2.keys():
                     prob_ham2 += math.log10(float(ham_freq2[word] + bigram_smoothing_parameter) / float(total_ham2 + bigram_smoothing_parameter * ham_len2))
                 else:
@@ -114,7 +105,6 @@ def development_phase(ham_freq, spam_freq, ham_freq2, spam_freq2, dev_set, unigr
             labels.append(1)
         else:
             labels.append(0)
-    print("finish labeling")
     return labels
 
 
@@ -154,5 +144,4 @@ def calculate_likelihood(train_set, train_labels):
                 ham_freq[word] += 1
             else:
                 spam_freq[word] += 1  
-    print("finish training")
     return ham_freq, spam_freq, ham_freq2, spam_freq2

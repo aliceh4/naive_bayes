@@ -84,8 +84,6 @@ def development_phase(ham_freq, spam_freq, dev_set, smoothing_parameter, pos_pri
 
         # Go through each word in email
         # NOTE: likelihood = [count(x) + k] / [N + k|X|]
-
-
         for word in email:
             # Check if word is in our likelihood dict (if word is not present, then likelihood = [0 + k] / [N + k|X|])
             if word in ham_freq.keys():
